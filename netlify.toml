@@ -1,0 +1,7 @@
+# Netlify configuration for Vite/React chatbot
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Vercel configuration for Vite/React chatbot
+# (Vercel auto-detects Vite, so no config needed unless customizing)
