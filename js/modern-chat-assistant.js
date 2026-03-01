@@ -26,8 +26,8 @@
   chatPopup.style.right = '32px';
   chatPopup.style.bottom = '110px';
   chatPopup.style.width = '370px';
-  chatPopup.style.maxHeight = '90vh';
-  chatPopup.style.height = '700px';
+  chatPopup.style.maxHeight = '520px';
+  chatPopup.style.height = '520px';
   chatPopup.style.background = '#181826';
   chatPopup.style.borderRadius = '18px';
   chatPopup.style.boxShadow = '0 4px 24px rgba(0,0,0,0.18)';
@@ -73,12 +73,15 @@
 
   async function fetchAssistantReply(question) {
     // Replace with your real API endpoint
-    const apiUrl = 'https://api.quotable.io/random'; // Example: returns a random quote
+    const apiUrl = 'https://festora-backend-api.example.com/assistant'; // <-- Update to your backend endpoint
     try {
-      // Simulate API call (replace with your own backend for real assistant)
-      const res = await fetch(apiUrl);
+      const res = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+      });
       const data = await res.json();
-      return data.content ? data.content : 'Sorry, I could not fetch a reply.';
+      return data.reply ? data.reply : 'Sorry, I could not fetch a reply.';
     } catch (err) {
       return 'Sorry, there was an error connecting to the assistant.';
     }
