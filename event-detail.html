@@ -1,0 +1,347 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Details – Festora</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
+</head>
+
+<body>
+
+    <div class="page-loader" id="page-loader">
+        <div class="loader-logo">🎵 Festora</div>
+        <div class="loader-spinner"></div>
+    </div>
+
+    <nav class="navbar" id="main-nav">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-logo">
+                <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="36" height="36" rx="9" fill="#0D0D16" />
+                    <rect width="36" height="36" rx="9" fill="url(#fbged)" opacity="0.15" />
+                    <path d="M10 9h14v4H14v4h9v4h-9v10h-4V9z" fill="url(#fgraded)" />
+                    <defs>
+                        <linearGradient id="fbged" x1="0" y1="0" x2="36" y2="36">
+                            <stop stop-color="#9B5DE5" />
+                            <stop offset="1" stop-color="#6D28D9" />
+                        </linearGradient>
+                        <linearGradient id="fgraded" x1="10" y1="9" x2="24" y2="31">
+                            <stop stop-color="#C084FC" />
+                            <stop offset="1" stop-color="#7C3AED" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>Festora</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="events.html" class="active">Events</a>
+                <a href="index.html#why">About</a>
+            </div>
+            <div id="nav-actions" class="nav-actions"></div>
+            <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+        </div>
+        <div id="mobile-menu" class="hidden"
+            style="background:var(--bg-card);border-top:1px solid var(--border-light);padding:16px 24px;display:flex;flex-direction:column;gap:16px;">
+            <a href="index.html" style="color:var(--text-secondary)">Home</a>
+            <a href="events.html" style="color:var(--text-secondary)">Events</a>
+        </div>
+    </nav>
+
+    <div class="event-detail-page" id="event-detail-page">
+        <!-- Hero -->
+        <div class="event-detail-hero" id="event-hero">
+            <img id="event-img" src="" alt="">
+            <div class="event-detail-hero-overlay"></div>
+            <div class="event-detail-hero-content">
+                <div class="container">
+                    <div style="margin-bottom:12px">
+                        <a href="events.html"
+                            style="color:rgba(255,255,255,0.6);font-size:0.85rem;display:inline-flex;align-items:center;gap:6px;transition:var(--transition)"
+                            onmouseover="this.style.color='white'"
+                            onmouseout="this.style.color='rgba(255,255,255,0.6)'">â† Back to Events</a>
+                    </div>
+                    <div id="event-badges" style="margin-bottom:12px"></div>
+                    <h1 class="event-detail-title" id="event-title">Loading...</h1>
+                    <p style="color:rgba(255,255,255,0.75);margin-top:8px;font-size:1.05rem" id="event-artist"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="container">
+            <div class="event-info-grid">
+                <div>
+                    <!-- Quick Info Pills -->
+                    <div id="event-pills" style="margin-bottom:32px"></div>
+
+                    <!-- Rating -->
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:28px">
+                        <div
+                            style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);padding:8px 16px;border-radius:var(--radius-full);display:flex;align-items:center;gap:6px">
+                            <span style="color:#FCD34D;font-size:1rem">★</span>
+                            <span id="event-rating" style="font-weight:700"></span>
+                            <span id="event-reviews" style="color:var(--text-muted);font-size:0.82rem"></span>
+                        </div>
+                        <button id="fav-btn" onclick="toggleFav()"
+                            style="background:rgba(244,114,182,0.1);border:1px solid rgba(244,114,182,0.3);border-radius:var(--radius-full);padding:8px 16px;color:#F9A8D4;cursor:pointer;font-size:0.85rem;font-weight:600;transition:var(--transition)">♥
+                            Save</button>
+                    </div>
+
+                    <!-- Description -->
+                    <div style="margin-bottom:36px">
+                        <h2 style="font-size:1.2rem;margin-bottom:14px">About This Event</h2>
+                        <p id="event-desc" style="color:var(--text-secondary);line-height:1.8"></p>
+                    </div>
+
+                    <!-- Lineup -->
+                    <div style="margin-bottom:36px">
+                        <h2 style="font-size:1.2rem;margin-bottom:16px">Lineup</h2>
+                        <div id="event-lineup" style="display:flex;flex-wrap:wrap;gap:10px"></div>
+                    </div>
+
+                    <!-- Map -->
+                    <div style="margin-bottom:36px">
+                        <h2 style="font-size:1.2rem;margin-bottom:16px">Venue Location</h2>
+                        <div
+                            style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-lg);overflow:hidden">
+                            <iframe id="venue-map" width="100%" height="300" style="border:0;" allowfullscreen=""
+                                loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                            <div
+                                style="padding:16px;background:var(--surface);display:flex;align-items:center;gap:12px;border-top:1px solid var(--border-light);">
+                                <span style="font-size:1.5rem">ðŸ“</span>
+                                <span id="venue-name"
+                                    style="color:var(--text-primary);font-size:0.95rem;font-weight:600"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Similar Events -->
+                    <div>
+                        <h2 style="font-size:1.2rem;margin-bottom:20px">Similar Events</h2>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" id="similar-events"></div>
+                    </div>
+                </div>
+
+                <!-- Buy Card -->
+                <div>
+                    <div class="event-buy-card">
+                        <div id="buy-price" class="price-big"></div>
+                        <div id="avail-bar" style="margin-bottom:16px"></div>
+
+                        <div style="margin-bottom:20px">
+                            <label class="form-label">Select Ticket Type</label>
+                            <div id="ticket-types-buy" class="ticket-types"></div>
+                        </div>
+
+                        <div style="margin-bottom:20px">
+                            <label class="form-label">Quantity</label>
+                            <div class="qty-control">
+                                <button class="qty-btn" onclick="changeQty(-1)">−</button>
+                                <input type="number" class="qty-input" id="qty-input" value="1" min="1" max="10"
+                                    onchange="updateTotal()">
+                                <button class="qty-btn" onclick="changeQty(1)">+</button>
+                            </div>
+                        </div>
+
+                        <div
+                            style="background:var(--surface);border-radius:var(--radius-md);padding:16px;margin-bottom:20px">
+                            <div
+                                style="display:flex;justify-content:space-between;color:var(--text-muted);font-size:0.85rem;margin-bottom:8px">
+                                <span>Ticket Price</span><span id="unit-price-display"></span>
+                            </div>
+                            <div
+                                style="display:flex;justify-content:space-between;color:var(--text-muted);font-size:0.85rem;margin-bottom:8px">
+                                <span>Quantity</span><span id="qty-display">1</span>
+                            </div>
+                            <div
+                                style="display:flex;justify-content:space-between;color:var(--text-muted);font-size:0.85rem;margin-bottom:8px">
+                                <span>Service Fee</span><span>₹49</span>
+                            </div>
+                            <div
+                                style="border-top:1px solid var(--border-light);padding-top:12px;display:flex;justify-content:space-between;font-weight:700">
+                                <span>Total</span><span id="total-display"
+                                    style="background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent"></span>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary"
+                            style="width:100%;justify-content:center;font-size:1rem;padding:16px"
+                            onclick="proceedToBooking()">
+                            ðŸŽŸï¸ &nbsp;Book Tickets Now
+                        </button>
+                        <p style="text-align:center;font-size:0.75rem;color:var(--text-muted);margin-top:12px">🔒
+                            Secure
+                            Checkout &nbsp;•&nbsp; Instant Gmail Delivery</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <span class="footer-copy">© 2026 Festora Inc.</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        let currentEvent = null;
+        let selectedTicketType = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await Auth.checkAuthSync();
+            const id = parseInt(new URLSearchParams(window.location.search).get('id'));
+            currentEvent = EVENTS.find(e => e.id === id);
+            if (!currentEvent) { window.location.href = 'events.html'; return; }
+
+            document.title = `${currentEvent.title} – Festora`;
+            renderEventDetail(currentEvent);
+        });
+
+        function renderEventDetail(e) {
+            document.getElementById('event-img').src = e.image;
+            document.getElementById('event-img').alt = e.title;
+            document.getElementById('event-title').textContent = e.title;
+            document.getElementById('event-artist').textContent = `by ${e.artist}`;
+            document.getElementById('event-badges').innerHTML = `<span class="badge ${genreClass(e.genre)}"
+        style="font-size:0.8rem;padding:6px 14px">${genreLabel(e.genre)}</span>${e.badge ? `<span
+        class="badge badge-${e.badge}"
+        style="margin-left:8px;font-size:0.8rem;padding:6px 14px">${e.badge.toUpperCase()}</span>` : ''}`;
+            document.getElementById('event-rating').textContent = `★ ${e.rating}`;
+            document.getElementById('event-reviews').textContent = `(${e.reviews} reviews)`;
+            document.getElementById('event-desc').textContent = e.description;
+            document.getElementById('venue-name').textContent = e.venue;
+
+            // Set Google Maps Embed based on venue
+            const encodedVenue = encodeURIComponent(e.venue);
+            document.getElementById('venue-map').src =
+                `https://maps.google.com/maps?q=${encodedVenue}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
+
+            document.getElementById('buy-price').textContent = `from ${formatPrice(e.price)}`;
+
+            // Pills
+            document.getElementById('event-pills').innerHTML = [
+                `<span class="event-info-pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+        </svg> ${formatDate(e.date)}</span>`,
+                `<span class="event-info-pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+        </svg> ${e.time}</span>`,
+                `<span class="event-info-pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+            <circle cx="12" cy="10" r="3" />
+        </svg> ${e.venue}</span>`,
+                `<span class="event-info-pill">🎫 ${e.available} seats left</span>`
+            ].join('');
+
+            // Availability bar
+            const pct = Math.round((e.available / e.seats) * 100);
+            const color = pct < 20 ? 'var(--error)' : pct < 50 ? 'var(--warning)' : 'var(--success)';
+            document.getElementById('avail-bar').innerHTML = ` <div
+        style="display:flex;justify-content:space-between;font-size:0.78rem;color:var(--text-muted);margin-bottom:6px">
+        <span>Seats Available</span><span style="color:${color}">${e.available} / ${e.seats}</span></div>
+        <div style="height:6px;background:var(--surface);border-radius:3px">
+            <div style="height:100%;width:${pct}%;background:${color};border-radius:3px;transition:width 0.6s ease">
+            </div>
+        </div>`;
+
+            // Lineup
+            document.getElementById('event-lineup').innerHTML = e.lineup.map(a => `<span
+            style="padding:8px 16px;background:var(--surface);border:1px solid var(--border-light);border-radius:var(--radius-full);font-size:0.82rem;font-weight:600">🎤
+            ${a}</span>`).join('');
+
+            // Ticket types
+            selectedTicketType = e.ticketTypes[0];
+            document.getElementById('ticket-types-buy').innerHTML = e.ticketTypes.map((t, i) => `
+        <div class="ticket-type-card ${i === 0 ? 'selected' : ''}" id="ttype-${t.id}"
+            onclick="selectTicketType('${t.id}')">
+            <div>
+                <div class="ticket-type-name">${t.name}</div>
+                <div class="ticket-type-desc">${t.desc} · ${t.available} available</div>
+            </div>
+            <div class="ticket-type-price">${formatPrice(t.price)}</div>
+        </div>`).join('');
+
+            updateTotal();
+
+            // Fav btn
+            document.getElementById('fav-btn').textContent = Auth.isFavorite(e.id) ? '♥ Saved' : '♥ Save';
+
+            // Similar events
+            const similar = EVENTS.filter(ev => ev.id !== e.id && ev.genre === e.genre).slice(0, 2);
+            document.getElementById('similar-events').innerHTML = similar.map(s => `
+        <div class="card" style="cursor:pointer" onclick="window.location='event-detail.html?id=${s.id}'">
+            <img src="${s.thumb}" style="width:100%;height:100px;object-fit:cover" alt="${s.title}">
+            <div style="padding:12px">
+                <div style="font-weight:700;font-size:0.88rem;margin-bottom:4px">${s.title}</div>
+                <div style="font-size:0.78rem;color:var(--text-muted)">${formatDate(s.date)}</div>
+                <div
+                    style="font-size:0.85rem;font-weight:700;margin-top:6px;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent">
+                    ${formatPrice(s.price)}</div>
+            </div>
+        </div>`).join('');
+        }
+
+        function selectTicketType(id) {
+            selectedTicketType = currentEvent.ticketTypes.find(t => t.id === id);
+            document.querySelectorAll('.ticket-type-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById('ttype-' + id).classList.add('selected');
+            updateTotal();
+        }
+
+        function changeQty(delta) {
+            const input = document.getElementById('qty-input');
+            const max = selectedTicketType ? Math.min(selectedTicketType.available, 10) : 10;
+            input.value = Math.max(1, Math.min(max, parseInt(input.value || 1) + delta));
+            updateTotal();
+        }
+
+        function updateTotal() {
+            if (!selectedTicketType) return;
+            const qty = parseInt(document.getElementById('qty-input').value || 1);
+            const total = selectedTicketType.price * qty + 49;
+            document.getElementById('unit-price-display').textContent = formatPrice(selectedTicketType.price);
+            document.getElementById('qty-display').textContent = qty;
+            document.getElementById('total-display').textContent = formatPrice(total);
+        }
+
+        function toggleFav() {
+            if (!Auth.isLoggedIn()) { window.location.href = 'login.html'; return; }
+            const added = Auth.toggleFavorite(currentEvent.id);
+            document.getElementById('fav-btn').textContent = added ? '♥ Saved' : '♥ Save';
+            Toast.show(added ? 'Added to favorites!' : 'Removed from favorites', added ? 'success' : 'info');
+        }
+
+        function proceedToBooking() {
+            if (!Auth.isLoggedIn()) {
+                LS.set('festora_redirect', window.location.href);
+                window.location.href = 'login.html';
+                return;
+            }
+            const qty = parseInt(document.getElementById('qty-input').value || 1);
+            LS.set('festora_booking', { eventId: currentEvent.id, ticketTypeId: selectedTicketType.id, quantity: qty });
+            window.location.href = 'checkout.html';
+        }
+    </script>
+</body>
+
+</html>

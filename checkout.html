@@ -1,0 +1,470 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout – Festora</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
+</head>
+
+<body>
+
+    <div class="page-loader" id="page-loader">
+        <div class="loader-logo">🎵 Festora</div>
+        <div class="loader-spinner"></div>
+    </div>
+
+    <nav class="navbar" id="main-nav">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-logo">
+                <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="36" height="36" rx="9" fill="#0D0D16" />
+                    <rect width="36" height="36" rx="9" fill="url(#fbgco)" opacity="0.15" />
+                    <path d="M10 9h14v4H14v4h9v4h-9v10h-4V9z" fill="url(#fgradco)" />
+                    <defs>
+                        <linearGradient id="fbgco" x1="0" y1="0" x2="36" y2="36">
+                            <stop stop-color="#9B5DE5" />
+                            <stop offset="1" stop-color="#6D28D9" />
+                        </linearGradient>
+                        <linearGradient id="fgradco" x1="10" y1="9" x2="24" y2="31">
+                            <stop stop-color="#C084FC" />
+                            <stop offset="1" stop-color="#7C3AED" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>Festora</span>
+            </a>
+            <div id="nav-actions" class="nav-actions"></div>
+        </div>
+    </nav>
+
+    <div class="checkout-page">
+        <div class="container">
+            <div style="margin-bottom:32px">
+                <a href="javascript:history.back()"
+                    style="color:var(--text-muted);font-size:0.85rem;display:inline-flex;align-items:center;gap:6px">â†
+                    Back</a>
+            </div>
+
+            <!-- Steps -->
+            <div class="checkout-steps">
+                <div class="step active" id="step-1-indicator">
+                    <div class="step-circle">1</div>
+                    <span class="step-label">Your Details</span>
+                </div>
+                <div class="step-line" id="line-1"></div>
+                <div class="step" id="step-2-indicator">
+                    <div class="step-circle">2</div>
+                    <span class="step-label">Payment</span>
+                </div>
+                <div class="step-line" id="line-2"></div>
+                <div class="step" id="step-3-indicator">
+                    <div class="step-circle">3</div>
+                    <span class="step-label">Confirm</span>
+                </div>
+            </div>
+
+            <div class="checkout-grid">
+                <!-- Left: Steps Content -->
+                <div>
+                    <!-- STEP 1: Details -->
+                    <div id="step-1">
+                        <div class="card" style="padding:28px;margin-bottom:20px">
+                            <div class="checkout-section-title">Your Details</div>
+                            <div class="card-input-row">
+                                <div class="form-group">
+                                    <label class="form-label">First Name</label>
+                                    <input type="text" id="fname" class="form-control" placeholder="John" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Last Name</label>
+                                    <input type="text" id="lname" class="form-control" placeholder="Doe" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email Address (Ticket sent here)</label>
+                                <div class="input-wrapper">
+                                    <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2">
+                                        <rect x="2" y="4" width="20" height="16" rx="2" />
+                                        <path d="m22 7-10 7L2 7" />
+                                    </svg>
+                                    <input type="email" id="checkout-email" class="form-control"
+                                        placeholder="you@gmail.com" required>
+                                </div>
+                                <div style="font-size:0.75rem;color:var(--primary-light);margin-top:4px">📧 Your
+                                    ticket
+                                    will be delivered to this email</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Phone Number</label>
+                                <div class="input-wrapper">
+                                    <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2">
+                                        <path
+                                            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.62 3.38 2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                                    </svg>
+                                    <input type="tel" id="checkout-phone" class="form-control"
+                                        placeholder="+91 98765 43210">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card" style="padding:28px">
+                            <div class="checkout-section-title">Ticket Selection</div>
+                            <div id="checkout-ticket-types" class="ticket-types"></div>
+                            <div style="display:flex;align-items:center;gap:16px;margin-top:16px">
+                                <label class="form-label" style="margin:0">Quantity:</label>
+                                <div class="qty-control">
+                                    <button class="qty-btn" onclick="changeQty(-1)">−</button>
+                                    <input type="number" class="qty-input" id="co-qty" value="1" min="1" max="10"
+                                        onchange="calcTotal()">
+                                    <button class="qty-btn" onclick="changeQty(1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-lg" style="margin-top:20px;width:100%;justify-content:center"
+                            onclick="goToStep(2)">Continue to Payment →</button>
+                    </div>
+
+                    <!-- STEP 2: Payment -->
+                    <div id="step-2" class="hidden">
+                        <div class="card" style="padding:28px;margin-bottom:20px">
+                            <div class="checkout-section-title">Payment Method</div>
+                            <div class="payment-methods">
+                                <button class="payment-method-btn active" id="pm-card"
+                                    onclick="selectPayment('card',this)">
+                                    <span style="font-size:1.4rem">💳</span> Credit/Debit Card
+                                </button>
+                                <button class="payment-method-btn" id="pm-upi" onclick="selectPayment('upi',this)">
+                                    <span style="font-size:1.4rem">📱</span> UPI
+                                </button>
+                                <button class="payment-method-btn" id="pm-netbanking"
+                                    onclick="selectPayment('netbanking',this)">
+                                    <span style="font-size:1.4rem">ðŸ¦</span> Net Banking
+                                </button>
+                            </div>
+
+                            <!-- Card Form -->
+                            <div id="payment-card">
+                                <div class="form-group">
+                                    <label class="form-label">Card Number</label>
+                                    <div class="input-wrapper">
+                                        <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <rect x="1" y="4" width="22" height="16" rx="2" />
+                                            <line x1="1" y1="10" x2="23" y2="10" />
+                                        </svg>
+                                        <input type="text" id="card-number" class="form-control"
+                                            placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCard(this)">
+                                    </div>
+                                </div>
+                                <div class="card-input-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Expiry Date</label>
+                                        <input type="text" id="card-expiry" class="form-control" placeholder="MM/YY"
+                                            maxlength="5" oninput="formatExpiry(this)">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">CVV</label>
+                                        <input type="password" id="card-cvv" class="form-control"
+                                            placeholder="•••" maxlength="4">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Name on Card</label>
+                                    <input type="text" id="card-name" class="form-control" placeholder="JOHN DOE">
+                                </div>
+                                <div
+                                    style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:var(--radius-md);padding:12px 16px;display:flex;align-items:center;gap:10px;font-size:0.82rem;color:#6EE7B7">
+                                    <span>🔒</span> Your payment info is encrypted with 256-bit SSL. We never store
+                                    card
+                                    details.
+                                </div>
+                            </div>
+
+                            <!-- UPI Form -->
+                            <div id="payment-upi" class="hidden">
+                                <div class="form-group">
+                                    <label class="form-label">UPI ID</label>
+                                    <input type="text" id="upi-id" class="form-control" placeholder="yourname@upi">
+                                </div>
+                                <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
+                                    <button onclick="setUPI('phonepay')" class="btn btn-ghost btn-sm">📱
+                                        PhonePe</button>
+                                    <button onclick="setUPI('googlepay')" class="btn btn-ghost btn-sm">🔵 Google
+                                        Pay</button>
+                                    <button onclick="setUPI('paytm')" class="btn btn-ghost btn-sm">💰 Paytm</button>
+                                    <button onclick="setUPI('bhim')" class="btn btn-ghost btn-sm">🇮🇳 BHIM</button>
+                                </div>
+                            </div>
+
+                            <!-- Net Banking -->
+                            <div id="payment-netbanking" class="hidden">
+                                <div class="form-group">
+                                    <label class="form-label">Select Bank</label>
+                                    <select class="form-control" id="bank-select">
+                                        <option value="">Choose your bank</option>
+                                        <option>State Bank of India</option>
+                                        <option>HDFC Bank</option>
+                                        <option>ICICI Bank</option>
+                                        <option>Axis Bank</option>
+                                        <option>Kotak Mahindra Bank</option>
+                                        <option>Yes Bank</option>
+                                        <option>Punjab National Bank</option>
+                                        <option>Canara Bank</option>
+                                    </select>
+                                </div>
+                                <p style="font-size:0.82rem;color:var(--text-muted)">You will be redirected to your
+                                    bank's secure net banking portal.</p>
+                            </div>
+                        </div>
+
+                        <div style="display:flex;gap:12px;margin-top:8px">
+                            <button class="btn btn-outline btn-lg" style="flex:1;justify-content:center"
+                                onclick="goToStep(1)">â† Back</button>
+                            <button class="btn btn-primary btn-lg" style="flex:2;justify-content:center"
+                                onclick="processPayment()">
+                                🔒 Pay <span id="pay-btn-amount"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: Confirm -->
+                    <div id="step-3" class="hidden">
+                        <div class="card" style="padding:40px;text-align:center">
+                            <div
+                                style="width:80px;height:80px;background:rgba(16,185,129,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2.5rem;border:2px solid rgba(16,185,129,0.3)">
+                                ✅</div>
+                            <h2 style="font-size:1.8rem;margin-bottom:8px">Payment Successful!</h2>
+                            <p style="color:var(--text-muted);margin-bottom:24px">Your booking is confirmed. Your ticket
+                                is on its way!</p>
+                            <div id="email-status"
+                                style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);border-radius:var(--radius-md);padding:16px;margin-bottom:24px;font-size:0.9rem;">
+                                📧 Sending ticket to <strong id="email-display"></strong>...
+                            </div>
+                            <button class="btn btn-primary btn-lg" onclick="viewTicket()"
+                                style="margin:0 auto;display:flex;justify-content:center">
+                                ðŸŽŸï¸ View My Ticket
+                            </button>
+                            <div style="margin-top:16px">
+                                <a href="index.html" style="color:var(--text-muted);font-size:0.85rem">â† Back to
+                                    Home</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Order Summary -->
+                <div>
+                    <div class="order-card">
+                        <h3 style="font-size:1rem;font-weight:700;margin-bottom:16px">Order Summary</h3>
+                        <div class="order-event-info">
+                            <img id="order-img" src="" alt="" class="order-event-img">
+                            <div>
+                                <div class="order-event-name" id="order-event-name">—</div>
+                                <div class="order-event-meta" id="order-event-meta">—</div>
+                            </div>
+                        </div>
+                        <div class="order-line"><span>Ticket Type</span><span id="order-type"
+                                style="font-weight:600">—</span></div>
+                        <div class="order-line"><span>Quantity</span><span id="order-qty">1</span></div>
+                        <div class="order-line"><span>Unit Price</span><span id="order-unit">—</span></div>
+                        <div class="order-line"><span>Service Fee</span><span>₹49</span></div>
+                        <div class="order-total"><span>Total</span><span class="order-total-price"
+                                id="order-total">—</span></div>
+                    </div>
+
+                    <!-- Trust badges -->
+                    <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px">
+                        <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:var(--text-muted)">
+                            <span>🔒</span> 256-bit SSL Encryption
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:var(--text-muted)">
+                            <span>📧</span> Instant Gmail Delivery
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:var(--text-muted)">
+                            <span>✅</span> 100% Authentic Tickets
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:var(--text-muted)">
+                            <span>â†©ï¸</span> Refund Policy Available
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        let checkoutEvent = null, checkoutTicketType = null, selectedPayment = 'card';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await Auth.checkAuthSync();
+            if (!requireAuth()) return;
+            const booking = LS.get('festora_booking');
+            if (!booking) { window.location.href = 'events.html'; return; }
+
+            checkoutEvent = EVENTS.find(e => e.id === booking.eventId);
+            if (!checkoutEvent) { window.location.href = 'events.html'; return; }
+
+            checkoutTicketType = checkoutEvent.ticketTypes.find(t => t.id === booking.ticketTypeId) || checkoutEvent.ticketTypes[0];
+
+            // Pre-fill user info
+            const session = Auth.getSession();
+            document.getElementById('checkout-email').value = session.email || '';
+            document.getElementById('fname').value = session.name?.split(' ')[0] || '';
+            document.getElementById('lname').value = session.name?.split(' ').slice(1).join(' ') || '';
+
+            // Render ticket types
+            document.getElementById('checkout-ticket-types').innerHTML = checkoutEvent.ticketTypes.map(t => `
+    <div class="ticket-type-card ${t.id === checkoutTicketType.id ? 'selected' : ''}" id="cot-${t.id}" onclick="selectCheckoutTicket('${t.id}')">
+      <div><div class="ticket-type-name">${t.name}</div><div class="ticket-type-desc">${t.desc}</div></div>
+      <div class="ticket-type-price">${formatPrice(t.price)}</div>
+    </div>`).join('');
+
+            document.getElementById('co-qty').value = booking.quantity || 1;
+
+            // Order summary
+            document.getElementById('order-img').src = checkoutEvent.thumb;
+            document.getElementById('order-event-name').textContent = checkoutEvent.title;
+            document.getElementById('order-event-meta').textContent = `${formatDate(checkoutEvent.date)} · ${checkoutEvent.city}`;
+
+            calcTotal();
+        });
+
+        function selectCheckoutTicket(id) {
+            checkoutTicketType = checkoutEvent.ticketTypes.find(t => t.id === id);
+            document.querySelectorAll('[id^="cot-"]').forEach(c => c.classList.remove('selected'));
+            document.getElementById('cot-' + id).classList.add('selected');
+            calcTotal();
+        }
+
+        function changeQty(delta) {
+            const input = document.getElementById('co-qty');
+            const max = checkoutTicketType ? Math.min(checkoutTicketType.available, 10) : 10;
+            input.value = Math.max(1, Math.min(max, parseInt(input.value || 1) + delta));
+            calcTotal();
+        }
+
+        function calcTotal() {
+            if (!checkoutTicketType) return;
+            const qty = parseInt(document.getElementById('co-qty').value || 1);
+            const total = checkoutTicketType.price * qty + 49;
+            document.getElementById('order-type').textContent = checkoutTicketType.name;
+            document.getElementById('order-qty').textContent = qty;
+            document.getElementById('order-unit').textContent = formatPrice(checkoutTicketType.price);
+            document.getElementById('order-total').textContent = formatPrice(total);
+            document.getElementById('pay-btn-amount').textContent = formatPrice(total);
+        }
+
+        function selectPayment(method, btn) {
+            selectedPayment = method;
+            document.querySelectorAll('.payment-method-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            ['card', 'upi', 'netbanking'].forEach(m => document.getElementById('payment-' + m).classList.toggle('hidden', m !== method));
+        }
+
+        function setUPI(app) { document.getElementById('upi-id').value = 'yourname@' + app.replace('phonepay', 'ybl').replace('googlepay', 'okicici').replace('paytm', 'paytm').replace('bhim', 'upi'); }
+
+        function formatCard(input) {
+            let v = input.value.replace(/\D/g, '').substring(0, 16);
+            input.value = v.replace(/(.{4})/g, '$1 ').trim();
+        }
+        function formatExpiry(input) {
+            let v = input.value.replace(/\D/g, '').substring(0, 4);
+            if (v.length >= 2) v = v.substring(0, 2) + '/' + v.substring(2);
+            input.value = v;
+        }
+
+        function goToStep(step) {
+            // Validate step 1
+            if (step === 2) {
+                if (!document.getElementById('fname').value || !document.getElementById('checkout-email').value) {
+                    Toast.error('Please fill in your name and email.');
+                    return;
+                }
+            }
+            [1, 2, 3].forEach(s => {
+                document.getElementById('step-' + s).classList.toggle('hidden', s !== step);
+                const el = document.getElementById('step-' + s + '-indicator');
+                el.className = 'step ' + (s < step ? 'done' : s === step ? 'active' : '');
+            });
+            [1, 2].forEach(l => document.getElementById('line-' + l).classList.toggle('done', l < step));
+            window.scrollTo(0, 0);
+        }
+
+        let finalBooking = null;
+
+        function processPayment() {
+            const fname = document.getElementById('fname').value;
+            const lname = document.getElementById('lname').value;
+            const email = document.getElementById('checkout-email').value;
+            const phone = document.getElementById('checkout-phone').value;
+            const qty = parseInt(document.getElementById('co-qty').value || 1);
+
+            const btn = document.querySelector('#step-2 .btn-primary');
+            btn.textContent = '⏳ Processing...'; btn.disabled = true;
+
+            const totalAmount = checkoutTicketType.price * qty + 49;
+            const nameStr = fname + ' ' + lname;
+
+            const options = {
+                key: typeof RAZORPAY_KEY !== 'undefined' && RAZORPAY_KEY !== 'YOUR_RAZORPAY_KEY_ID' ? RAZORPAY_KEY : 'rzp_test_YourMockKeyHere',
+                amount: totalAmount * 100,
+                currency: 'INR',
+                name: 'Festora',
+                description: 'Ticket Booking - ' + checkoutEvent.title,
+                image: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=200',
+                handler: function (response) {
+                    Toast.success('Payment Successful!');
+
+                    finalBooking = createBooking(checkoutEvent, checkoutTicketType, qty,
+                        { name: nameStr, email, phone: phone },
+                        { method: 'Razorpay - ' + (response.razorpay_payment_id || 'MOCK') });
+
+                    Auth.addBooking(finalBooking);
+                    LS.set('festora_last_booking', finalBooking);
+
+                    goToStep(3);
+                    document.getElementById('email-display').textContent = email;
+
+                    sendTicketEmail(finalBooking).then(sent => {
+                        const statusEl = document.getElementById('email-status');
+                        statusEl.innerHTML = sent
+                            ? `📧 Ticket sent to <strong>${email}</strong> ✅`
+                            : `📧 Ticket saved to your profile. View it in <strong>My Tickets</strong>.<br><small style="color:var(--text-muted)">Email delivery: Configure EmailJS for auto delivery.</small>`;
+                    });
+
+                    btn.textContent = '🔒 Pay'; btn.disabled = false;
+                },
+                prefill: { name: nameStr, email: email, contact: phone },
+                theme: { color: '#9F67FF' },
+                modal: {
+                    ondismiss: function () {
+                        Toast.info('Payment cancelled.');
+                        btn.textContent = '🔒 Pay'; btn.disabled = false;
+                    }
+                }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.on('payment.failed', function (response) {
+                Toast.error('Payment Failed: ' + response.error.description);
+                btn.textContent = '🔒 Pay'; btn.disabled = false;
+            });
+            rzp.open();
+        }
+
+        function viewTicket() {
+            window.location.href = 'ticket.html';
+        }
+    </script>
+</body>
+
+</html>

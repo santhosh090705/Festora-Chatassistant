@@ -1,0 +1,248 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Ticket – Festora</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
+</head>
+
+<body>
+
+    <div class="page-loader" id="page-loader">
+        <div class="loader-logo">🎵 Festora</div>
+        <div class="loader-spinner"></div>
+    </div>
+
+    <nav class="navbar" id="main-nav">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-logo">
+                <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="36" height="36" rx="9" fill="#0D0D16" />
+                    <rect width="36" height="36" rx="9" fill="url(#fbgtk)" opacity="0.15" />
+                    <path d="M10 9h14v4H14v4h9v4h-9v10h-4V9z" fill="url(#fgradtk)" />
+                    <defs>
+                        <linearGradient id="fbgtk" x1="0" y1="0" x2="36" y2="36">
+                            <stop stop-color="#9B5DE5" />
+                            <stop offset="1" stop-color="#6D28D9" />
+                        </linearGradient>
+                        <linearGradient id="fgradtk" x1="10" y1="9" x2="24" y2="31">
+                            <stop stop-color="#C084FC" />
+                            <stop offset="1" stop-color="#7C3AED" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>Festora</span>
+            </a>
+            <div id="nav-actions" class="nav-actions"></div>
+        </div>
+    </nav>
+
+    <div class="ticket-page">
+        <div class="container">
+            <div style="text-align:center;margin-bottom:40px">
+                <div style="font-size:4rem;margin-bottom:16px">🎉</div>
+                <h1 style="font-size:2rem;margin-bottom:8px">You're Going!</h1>
+                <p style="color:var(--text-muted)">Here's your official Festora ticket. Save or screenshot it!</p>
+            </div>
+
+            <div class="ticket-wrapper">
+                <!-- TICKET CARD -->
+                <div class="ticket-card" id="ticket-card" style="overflow:hidden;">
+                    <!-- Event Thumbnail -->
+                    <img id="tk-img" src="" alt="Event Thumbnail"
+                        style="width:100%;height:160px;object-fit:cover;display:block;border-bottom:2px dashed rgba(255,255,255,0.1)">
+
+                    <!-- Header -->
+                    <div class="ticket-header" style="border-top-left-radius:0;border-top-right-radius:0;">
+                        <div
+                            style="display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1">
+                            <div>
+                                <div
+                                    style="font-size:0.72rem;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,0.7);margin-bottom:6px">
+                                    🎵 Festora Official Ticket</div>
+                                <div class="ticket-title" id="tk-event-title">—</div>
+                                <div class="ticket-event-name" id="tk-artist">—</div>
+                            </div>
+                            <div style="text-align:right;position:relative;z-index:1">
+                                <div style="font-size:0.72rem;color:rgba(255,255,255,0.7)">Booking ID</div>
+                                <div style="font-size:0.9rem;font-weight:700;color:white;letter-spacing:1px"
+                                    id="tk-booking-id">—</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Perforations -->
+                    <div class="ticket-perforations">
+                        <div class="perf-circle"></div>
+                        <div class="perf-line"></div>
+                        <div
+                            style="padding:0 16px;font-size:0.7rem;color:var(--text-muted);font-weight:600;white-space:nowrap">
+                            ✂ TEAR HERE</div>
+                        <div class="perf-line"></div>
+                        <div class="perf-circle"></div>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="ticket-body">
+                        <div class="ticket-details">
+                            <div>
+                                <div class="ticket-detail-label">Event Date</div>
+                                <div class="ticket-detail-value" id="tk-date">—</div>
+                            </div>
+                            <div>
+                                <div class="ticket-detail-label">Event Time</div>
+                                <div class="ticket-detail-value" id="tk-time">—</div>
+                            </div>
+                            <div>
+                                <div class="ticket-detail-label">Venue</div>
+                                <div class="ticket-detail-value" id="tk-venue" style="font-size:0.85rem">—</div>
+                            </div>
+                            <div>
+                                <div class="ticket-detail-label">Ticket Type</div>
+                                <div class="ticket-detail-value" id="tk-type">—</div>
+                            </div>
+                            <div>
+                                <div class="ticket-detail-label">Attendee</div>
+                                <div class="ticket-detail-value" id="tk-name">—</div>
+                            </div>
+                            <div>
+                                <div class="ticket-detail-label">Quantity</div>
+                                <div class="ticket-detail-value" id="tk-qty">—</div>
+                            </div>
+                        </div>
+
+                        <!-- QR Code -->
+                        <div class="ticket-qr">
+                            <div style="text-align:center">
+                                <canvas id="qr-canvas" width="160" height="160"
+                                    style="border-radius:8px;border:3px solid white;box-shadow:0 4px 20px rgba(0,0,0,0.3)"></canvas>
+                                <div style="font-size:0.72rem;color:var(--text-muted);margin-top:8px">Scan at entrance
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ticket-barcode" id="tk-ticket-id">— — — — — — — — —</div>
+
+                        <!-- Total -->
+                        <div
+                            style="text-align:center;margin-top:16px;padding-top:16px;border-top:1px solid var(--border-light)">
+                            <span style="font-size:0.78rem;color:var(--text-muted)">Total Paid: </span>
+                            <span id="tk-amount"
+                                style="font-weight:800;font-size:1.1rem;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent">—</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="ticket-actions">
+                    <button class="btn btn-primary btn-lg" style="flex:1;justify-content:center"
+                        onclick="downloadTicket()">
+                        â¬‡ï¸ Download Ticket
+                    </button>
+                    <button class="btn btn-outline btn-lg" style="flex:1;justify-content:center"
+                        onclick="shareTicket()">
+                        📤 Share
+                    </button>
+                </div>
+
+                <!-- Email Status -->
+                <div id="email-notif"
+                    style="margin-top:20px;padding:16px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:var(--radius-md);text-align:center;font-size:0.85rem;color:#6EE7B7">
+                    📧 A copy of your ticket has been saved to your Festora account.<br>
+                    <span style="color:var(--text-muted);font-size:0.78rem">Configure EmailJS in app.js to enable
+                        automatic Gmail delivery.</span>
+                </div>
+
+                <!-- Navigation -->
+                <div style="display:flex;gap:12px;margin-top:20px;justify-content:center">
+                    <a href="profile.html" class="btn btn-ghost">📂 My Tickets</a>
+                    <a href="events.html" class="btn btn-ghost">🎵 More Events</a>
+                    <a href="index.html" class="btn btn-ghost">ðŸ  Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await Auth.checkAuthSync();
+            if (!requireAuth()) return;
+            const booking = LS.get('festora_last_booking');
+            if (!booking) { window.location.href = 'profile.html'; return; }
+
+            document.title = `Ticket: ${booking.eventTitle} – Festora`;
+
+            const event = EVENTS.find(e => e.id === booking.eventId);
+            if (event) {
+                document.getElementById('tk-img').src = event.image;
+            }
+
+            document.getElementById('tk-event-title').textContent = booking.eventTitle;
+            document.getElementById('tk-artist').textContent = booking.venue;
+            document.getElementById('tk-booking-id').textContent = booking.bookingId;
+            document.getElementById('tk-date').textContent = formatDate(booking.eventDate);
+            document.getElementById('tk-time').textContent = booking.eventTime;
+            document.getElementById('tk-venue').textContent = booking.venue;
+            document.getElementById('tk-type').textContent = booking.ticketType;
+            document.getElementById('tk-name').textContent = booking.name;
+            document.getElementById('tk-qty').textContent = booking.quantity + (booking.quantity > 1 ? ' tickets' : ' ticket');
+            document.getElementById('tk-amount').textContent = formatPrice(booking.totalAmount + 49);
+            document.getElementById('tk-ticket-id').textContent = booking.ticketId;
+
+            // Generate QR
+            const canvas = document.getElementById('qr-canvas');
+            generateQR(canvas, booking.bookingId + '|' + booking.ticketId);
+        });
+
+        function downloadTicket() {
+            // Simple print-to-PDF approach
+            const ticket = document.getElementById('ticket-card');
+            const originalBody = document.body.innerHTML;
+            const printContent = `<html>
+
+        <head>
+            <style>
+                body {
+                    background: #0A0A0F;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-height: 100vh;
+                    font-family: Inter, sans-serif
+                }
+            </style>
+            <link rel="stylesheet" href="css/style.css">
+        </head>
+
+        <body style="padding:40px">${ticket.outerHTML}</body>
+
+        </html>`;
+            const w = window.open('', '_blank');
+            w.document.write(printContent);
+            w.document.close();
+            setTimeout(() => { w.print(); }, 600);
+        }
+
+        function shareTicket() {
+            const booking = LS.get('festora_last_booking');
+            if (navigator.share) {
+                navigator.share({
+                    title: 'My Festora Ticket', text: `I'm going to ${booking?.eventTitle}! 🎵`, url:
+                        window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                Toast.success('Ticket link copied to clipboard!');
+            }
+        }
+    </script>
+</body>
+
+</html>
