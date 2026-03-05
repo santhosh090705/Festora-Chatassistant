@@ -6,6 +6,10 @@
 (function () {
     'use strict';
 
+    // 🔑 ADD YOUR OPENROUTER API KEY HERE:
+    // Get a free key at https://openrouter.ai/
+    window.OPENROUTER_API_KEY = 'YOUR_API_KEY_HERE';
+
     /* ─── State ─────────────────────────────────────────────── */
     let msgs = [];
     let isTyping = false;
@@ -247,30 +251,67 @@
         }
     }
 
+    async function fetchQwenResponse(userText) {
+        if (!window.OPENROUTER_API_KEY || window.OPENROUTER_API_KEY === 'YOUR_API_KEY_HERE') {
+            botSay("Looks like you haven't added your OpenRouter API key yet! Please add it at the top of `js/chatbot-widget.js` to enable Qwen AI.", [
+                { label: '🎵 Browse Events', action: doBrowse }
+            ]);
+            return;
+        }
+
+        isTyping = true;
+        renderTyping();
+        scrollBottom();
+
+        try {
+            const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${window.OPENROUTER_API_KEY}`,
+                    'HTTP-Referer': window.location.href,
+                    'X-Title': 'Festora',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: 'qwen/qwen-2.5-72b-instruct:free',
+                    messages: [
+                        { role: 'system', content: 'You are Festora Assistant, a helpful AI booking agent for live music concerts and festivals in India. Be friendly, enthusiastic, and concise. You can answer general questions about music, concerts, and how to use the platform. Limit your responses to 1-3 short paragraphs.' },
+                        { role: 'user', content: userText }
+                    ]
+                })
+            });
+
+            const data = await response.json();
+            isTyping = false;
+
+            if (data.choices && data.choices[0] && data.choices[0].message) {
+                const reply = data.choices[0].message.content;
+                msgs.push({ id: uid(), sender: 'bot', text: reply, opts: [{ label: '🎵 Browse Events', action: doBrowse }] });
+                renderMessages();
+            } else {
+                msgs.push({ id: uid(), sender: 'bot', text: "Sorry, I'm having trouble connecting to Qwen right now. Want to browse events instead?", opts: [{ label: '🎵 Browse Events', action: doBrowse }] });
+                renderMessages();
+            }
+        } catch (error) {
+            isTyping = false;
+            msgs.push({ id: uid(), sender: 'bot', text: "Sorry, an error occurred while connecting to my AI brain. Want to browse events instead?", opts: [{ label: '🎵 Browse Events', action: doBrowse }] });
+            renderMessages();
+        }
+    }
+
     function handleUserInput(val) {
         if (!val) return;
         if (step === 'ENTER_QTY') {
             handleQtyInput(val);
         } else {
             userSay(val);
-            // Basic keyword matching
+            // Hybrid Approach: Check for specific booking intents first
             const lower = val.toLowerCase();
-            if (lower.includes('browse') || lower.includes('event') || lower.includes('show') || lower.includes('concert')) {
+            if (lower.includes('browse') || lower.includes('event') || lower.includes('show') || lower.includes('concert') || lower.includes('book') || lower.includes('ticket')) {
                 doBrowse();
-            } else if (lower.includes('book') || lower.includes('ticket')) {
-                doBrowse();
-            } else if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey')) {
-                botSay("Hey there! 👋 I'm Festora's booking assistant. Want to browse events?", [
-                    { label: '🎵 Browse Events', action: doBrowse }
-                ]);
-            } else if (lower.includes('help')) {
-                botSay("I can help you browse and book tickets for live events! Just tap below to get started.", [
-                    { label: '🎵 Browse Events', action: doBrowse }
-                ]);
             } else {
-                botSay("I'm best at helping you find and book event tickets! Try browsing events below.", [
-                    { label: '🎵 Browse Events', action: doBrowse }
-                ]);
+                // Route all other chat natively to Qwen AI!
+                fetchQwenResponse(val);
             }
         }
     }
