@@ -303,7 +303,7 @@
       </div>
       <div class="event-card-body">
         <div class="event-card-title">${e.title}</div>
-        <div class="event-card-meta"><span>📅 ${formatDate(e.date)}</span><span>ðŸ“ ${e.city}</span></div>
+        <div class="event-card-meta"><span>📅 ${formatDate(e.date)}</span><span>📍 ${e.city}</span></div>
         <div class="event-card-footer">
           <span class="event-price">from ${formatPrice(e.price)}</span>
           <button class="event-card-btn" onclick="event.stopPropagation();window.location='event-detail.html?id=${e.id}'">Book</button>
