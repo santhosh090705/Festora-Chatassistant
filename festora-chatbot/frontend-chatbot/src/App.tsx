@@ -291,7 +291,8 @@ export default function App() {
       }
     } else {
       const lower = val.toLowerCase();
-      if (lower.includes('browse') || lower.includes('event') || lower.includes('show') || lower.includes('concert') || lower.includes('book') || lower.includes('ticket')) {
+      const triggers = ['browse', 'event', 'show', 'concert', 'book', 'ticket', 'festival', 'discovery', 'buy', 'purchase', 'happen', 'what\'s on', 'find show', 'find event'];
+      if (triggers.some(t => lower.includes(t))) {
         doBrowse();
       } else {
         fetchQwenResponse(val);
@@ -353,7 +354,8 @@ export default function App() {
       }
     } else {
       const lower = val.toLowerCase();
-      if (lower.includes('browse') || lower.includes('event') || lower.includes('show') || lower.includes('concert') || lower.includes('book') || lower.includes('ticket')) {
+      const triggers = ['browse', 'event', 'show', 'concert', 'book', 'ticket', 'festival', 'discovery', 'buy', 'purchase', 'happen', 'what\'s on', 'find show', 'find event'];
+      if (triggers.some(t => lower.includes(t))) {
         doBrowse();
       } else {
         fetchQwenResponse(val);
