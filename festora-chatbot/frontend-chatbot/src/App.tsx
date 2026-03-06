@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Send, Bot } from 'lucide-react';
+import { Send, Bot, Mic } from 'lucide-react';
 import { supabase } from './supabaseClient';
 import { EVENTS } from './data';
 import type { EventMatch, TicketType } from './data';
@@ -21,7 +21,7 @@ interface Msg {
   text: string;
   opts?: Opt[];
   concert?: EventMatch;
-// ...existing code...
+}
 
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
 
@@ -107,7 +107,16 @@ export default function App() {
     setTimeout(() => {
       setMsgs(p => [...p, { id: uid(), sender: 'bot', text, opts, concert: ev }]);
       setTyping(false);
+      speakText(text);
     }, 500 + Math.random() * 400);
+  };
+
+  const speakText = (text: string) => {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text.replace(/\*\*/g, ''));
+    utterance.lang = 'en-IN';
+    window.speechSynthesis.speak(utterance);
   };
 
   const userSay = (text: string) => setMsgs(p => [...p, { id: uid(), sender: 'user', text }]);
@@ -151,6 +160,31 @@ export default function App() {
       `Venue:  ${concert.venue}`,
       `Date:   ${new Date(concert.date).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}`,
       `Ticket: ${ticket.name}  x${n}`,
+      `Total:  ₹${total.toLocaleString('en-IN')}`,
+      ``,
+      `Name:   ${name}`,
+      `Email:  ${user?.email || '—'}`,
+    ].join('\n');
+    botSay(lines, [
+      { label: '✅ Confirm & Book', action: () => doBook(n) },
+      { label: '❌ Cancel', action: doCancel },
+    ]);
+  }
+
+  function doConfirmWith(c: EventMatch, t: TicketType, n: number) {
+    setConcert(c);
+    setTicket(t);
+    setQty(n);
+    setStep('CONFIRMING');
+    const total = t.price * n;
+    const name = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Guest';
+    const lines = [
+      `Please confirm your booking:`,
+      ``,
+      `Event:  ${c.title}`,
+      `Venue:  ${c.venue}`,
+      `Date:   ${new Date(c.date).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}`,
+      `Ticket: ${t.name}  x${n}`,
       `Total:  ₹${total.toLocaleString('en-IN')}`,
       ``,
       `Name:   ${name}`,
@@ -285,6 +319,48 @@ export default function App() {
     }
   }
 
+  const [isRecording, setIsRecording] = useState(false);
+
+  const startVoiceInput = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-IN';
+    recognition.onstart = () => setIsRecording(true);
+    recognition.onend = () => setIsRecording(false);
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setInput(transcript);
+      // We don't auto-submit here in React version to let user review, 
+      // but we could if desired. Let's match the widget behavior.
+      handleSubmitDirect(transcript);
+    };
+    recognition.start();
+  };
+
+  const handleSubmitDirect = (val: string) => {
+    if (!val || typing) return;
+    setInput('');
+    userSay(val);
+
+    if (step === 'ENTER_QTY') {
+      const n = parseInt(val, 10);
+      if (isNaN(n) || n < 1 || n > 10) {
+        botSay('Please enter a number between 1 and 10.');
+      } else {
+        doConfirm(n);
+      }
+    } else {
+      const lower = val.toLowerCase();
+      if (lower.includes('browse') || lower.includes('event') || lower.includes('show') || lower.includes('concert') || lower.includes('book') || lower.includes('ticket')) {
+        doBrowse();
+      } else {
+        fetchQwenResponse(val);
+      }
+    }
+  };
+
   async function doLogin(pendingQty?: number) {
     userSay('Sign in with Google');
     savePendingBooking(pendingQty);
@@ -373,6 +449,15 @@ export default function App() {
               onChange={e => setInput(e.target.value)}
               disabled={typing}
             />
+            <button
+              type="button"
+              className={`voice-btn ${isRecording ? 'recording' : ''}`}
+              onClick={startVoiceInput}
+              title="Voice Input"
+              style={{ background: 'none', border: 'none', color: isRecording ? '#EF4444' : '#7c3aed', cursor: 'pointer', padding: '0 8px', display: 'flex', alignItems: 'center' }}
+            >
+              <Mic size={20} className={isRecording ? 'pulse' : ''} />
+            </button>
             <button type="submit" className="send-btn" disabled={!input.trim() || typing}>
               <Send size={16} />
             </button>

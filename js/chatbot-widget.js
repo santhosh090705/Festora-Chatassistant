@@ -122,6 +122,7 @@
             msgs.push({ id: uid(), sender: 'bot', text, opts, concert });
             isTyping = false;
             renderMessages();
+            speakText(text);
         }, 500 + Math.random() * 400);
     }
 
@@ -515,6 +516,19 @@
       }
       .fcw-send-btn:hover:not(:disabled) { transform: scale(1.08); }
       .fcw-send-btn:disabled { background: #e5e7eb; cursor: not-allowed; }
+      .fcw-voice-btn {
+        width: 32px; height: 32px; background: transparent;
+        color: #7c3aed; border: none; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+      }
+      .fcw-voice-btn:hover { background: rgba(124,58,237,0.1); }
+      .fcw-voice-btn.recording { color: #EF4444; animation: fcwPulse 1.5s infinite; }
+      @keyframes fcwPulse {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.2); opacity: 0.7; }
+        100% { transform: scale(1); opacity: 1; }
+      }
       .fcw-powered { text-align: center; font-size: 0.64rem; color: #9ca3af; margin-top: 5px; }
 
       @media (max-width: 440px) {
@@ -563,6 +577,11 @@
       <div class="fcw-input-area">
         <form class="fcw-input-form" id="fcw-form">
           <input class="fcw-input-field" id="fcw-input" type="text" placeholder="Type a message…" autocomplete="off"/>
+          <button type="button" class="fcw-voice-btn" id="fcw-voice" title="Voice Input">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+            </svg>
+          </button>
           <button type="submit" class="fcw-send-btn" id="fcw-send" disabled>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
@@ -630,6 +649,67 @@
 
     function lastMsgId() {
         return msgs.length ? msgs[msgs.length - 1].id : null;
+    }
+
+    /* ─── Voice ─────────────────────────────────────────────── */
+    let recognition;
+    let isSpeaking = false;
+
+    function initVoice() {
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            const btn = document.getElementById('fcw-voice');
+            if (btn) btn.style.display = 'none';
+            return;
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-IN';
+
+        recognition.onstart = () => {
+            const btn = document.getElementById('fcw-voice');
+            btn?.classList.add('recording');
+        };
+
+        recognition.onend = () => {
+            const btn = document.getElementById('fcw-voice');
+            btn?.classList.remove('recording');
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            if (inputEl) {
+                inputEl.value = transcript;
+                updateSendBtn();
+                handleUserInput(transcript);
+            }
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            const btn = document.getElementById('fcw-voice');
+            btn?.classList.remove('recording');
+        };
+
+        document.getElementById('fcw-voice')?.addEventListener('click', () => {
+            if (recognition) recognition.start();
+        });
+    }
+
+    function speakText(text) {
+        if (!('speechSynthesis' in window)) return;
+
+        // Cancel any current speaking
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(text.replace(/\*\*/g, '')); // Clean markdown
+        utterance.lang = 'en-IN';
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+
+        window.speechSynthesis.speak(utterance);
     }
 
     function renderMessages() {
@@ -724,6 +804,7 @@
         if (initialized) return;
         initialized = true;
         buildWidget();
+        initVoice();
 
         // Auth setup
         syncUser();
