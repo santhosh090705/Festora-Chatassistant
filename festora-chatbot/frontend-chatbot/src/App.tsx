@@ -205,49 +205,145 @@ export default function App() {
     }
   }
 
+  const OPENROUTER_API_KEY = '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';
+
+  async function fetchQwenResponse(userText: string) {
+    setTyping(true);
+    try {
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+          'HTTP-Referer': window.location.href,
+          'X-Title': 'Festora Standalone',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'qwen/qwen-2.5-72b-instruct:free',
+          messages: [
+            { role: 'system', content: 'You are Festora Assistant, a helpful AI booking agent for live music concerts and festivals in India. Be friendly, enthusiastic, and concise. Limit responses to 1-3 short paragraphs.' },
+            { role: 'user', content: userText }
+          ]
+        })
+      });
+
+      const data = await response.json();
+      setTyping(false);
+
+      if (data.choices && data.choices[0] && data.choices[0].message) {
+        setMsgs(p => [...p, { id: uid(), sender: 'bot', text: data.choices[0].message.content, opts: [{ label: '🎵 Browse Events', action: doBrowse }] }]);
+      } else {
+        botSay("I'm having trouble connecting to my AI brain. Want to browse events instead?", [{ label: '🎵 Browse Events', action: doBrowse }]);
+      }
+    } catch (error) {
+      setTyping(false);
+      botSay("I'm having trouble connecting to my AI brain. Want to browse events instead?", [{ label: '🎵 Browse Events', action: doBrowse }]);
+    }
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const val = input.trim();
-    if (!val) return;
+    if (!val || typing) return;
     setInput('');
+    userSay(val);
 
-    // Chatbot UI as a component
-    const chatbotUI = (
-      <div className="chatbot-window floating-chatbot">
+    if (step === 'ENTER_QTY') {
+      const n = parseInt(val, 10);
+      if (isNaN(n) || n < 1 || n > 10) {
+        botSay('Please enter a number between 1 and 10.');
+      } else {
+        doConfirm(n);
+      }
+    } else {
+      const lower = val.toLowerCase();
+      if (lower.includes('browse') || lower.includes('event') || lower.includes('show') || lower.includes('concert') || lower.includes('book') || lower.includes('ticket')) {
+        doBrowse();
+      } else {
+        fetchQwenResponse(val);
+      }
+    }
+  };
+
+  const lastId = msgs[msgs.length - 1]?.id;
+
+  async function handleLogin() {
+    doLogin(qty);
+  }
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+  }
+
+  function savePendingBooking(n?: number) {
+    if (concert && ticket && n) {
+      sessionStorage.setItem('festora_pending_booking', JSON.stringify({
+        savedConcert: concert,
+        savedTicket: ticket,
+        savedQty: n
+      }));
+    }
+  }
+
+  async function doLogin(pendingQty?: number) {
+    userSay('Sign in with Google');
+    savePendingBooking(pendingQty);
+    try {
+      // Always redirect back to THIS chatbot page, not the main Festora site
+      const chatbotUrl = window.location.origin + window.location.pathname;
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: chatbotUrl }
+      });
+      if (error) throw error;
+      botSay('Opening Google sign-in… Come back to this page after signing in and your booking will resume automatically! 🎵');
+    } catch {
+      botSay("Couldn't open sign-in. Make sure your Supabase anon key is set in the .env file.");
+    }
+  }
+
+
+
+  return (
+    <div className="app-container">
+      <div className="chatbot-window">
         {/* Header */}
         <div className="chatbot-header">
-          <div className="bot-avatar"><Bot size={28} /></div>
+          <div className="bot-avatar"><Bot size={20} color="white" /></div>
           <div className="header-info">
             <h2>Festora Assistant</h2>
-            <p>Ask about concerts, tickets, or artists!</p>
+            <p>{user ? `${user.user_metadata?.full_name || user.email}` : 'Sign in to book tickets'}</p>
           </div>
-          {user ? (
-            <button className="logout-btn" onClick={handleLogout} title="Logout">⎋</button>
-          ) : (
-            <button className="login-pill" onClick={handleLogin}>Login</button>
+          {user && (
+            <button className="logout-btn" title="Sign out" onClick={() => supabase.auth.signOut()}>✕</button>
+          )}
+          {!user && (
+            <button className="login-pill" onClick={() => doLogin()}>Sign in</button>
           )}
         </div>
 
-        {/* Chat Area */}
+        {/* Messages */}
         <div className="chat-history">
-          {msgs.map((m, i) => (
+          {msgs.map(m => (
             <div key={m.id} className={`message ${m.sender}`}>
-              {m.text}
+              {m.text.split('\n').map((line, i) => (
+                <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
+              ))}
               {m.concert && (
                 <div className="concert-card-mini">
-                  <img src={m.concert.thumb} alt={m.concert.name} />
+                  <img src={m.concert.thumb} alt={m.concert.title} />
                   <div>
-                    <strong>{m.concert.name}</strong>
-                    <span>{m.concert.date} · {m.concert.venue}</span>
-                    <span className="price-tag">₹{m.concert.price}</span>
+                    <strong>{m.concert.title}</strong>
+                    <span>{m.concert.venue}</span>
+                    <span className="price-tag">{m.concert.priceRange}</span>
                   </div>
                 </div>
               )}
               {m.opts && (
                 <div className="message-options">
-                  {m.opts.map((o, j) => (
+                  {m.opts.map((o, i) => (
                     <button
-                      key={j}
+                      key={i}
                       className="option-btn"
                       disabled={typing || m.id !== lastId}
                       onClick={o.action}
@@ -284,127 +380,8 @@ export default function App() {
           <p className="powered-by">Powered by Festora · Supabase</p>
         </div>
       </div>
-    );
-
-    // Render chatbot as floating widget at bottom right
-    useEffect(() => {
-      let el = document.getElementById('floating-chatbot-root');
-      if (!el) {
-        el = document.createElement('div');
-        el.id = 'floating-chatbot-root';
-        document.body.appendChild(el);
-        const root = createRoot(el);
-        root.render(chatbotUI);
-      }
-      return () => {
-        if (el) {
-          el.remove();
-        }
-      };
-    }, [msgs, typing, input, user, step, concert, ticket, qty]);
-
-    // Optionally render nothing in main layout
-    return null;
-  }
-}
-
-async function doLogin(pendingQty?: number) {
-  userSay('Sign in with Google');
-  savePendingBooking(pendingQty);
-  try {
-    // Always redirect back to THIS chatbot page, not the main Festora site
-    const chatbotUrl = window.location.origin + window.location.pathname;
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: chatbotUrl }
-    });
-    if (error) throw error;
-    botSay('Opening Google sign-in… Come back to this page after signing in and your booking will resume automatically! 🎵');
-  } catch {
-    botSay("Couldn't open sign-in. Make sure your Supabase anon key is set in the .env file.");
-  }
-}
-
-const lastId = msgs[msgs.length - 1]?.id;
-
-return (
-  <div className="app-container">
-    <div className="chatbot-window">
-      {/* Header */}
-      <div className="chatbot-header">
-        <div className="bot-avatar"><Bot size={20} color="white" /></div>
-        <div className="header-info">
-          <h2>Festora Assistant</h2>
-          <p>{user ? `${user.user_metadata?.full_name || user.email}` : 'Sign in to book tickets'}</p>
-        </div>
-        {user && (
-          <button className="logout-btn" title="Sign out" onClick={() => supabase.auth.signOut()}>✕</button>
-        )}
-        {!user && (
-          <button className="login-pill" onClick={() => doLogin()}>Sign in</button>
-        )}
-      </div>
-
-      {/* Messages */}
-      <div className="chat-history">
-        {msgs.map(m => (
-          <div key={m.id} className={`message ${m.sender}`}>
-            {m.text.split('\n').map((line, i) => (
-              <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
-            ))}
-            {m.concert && (
-              <div className="concert-card-mini">
-                <img src={m.concert.thumb} alt={m.concert.title} />
-                <div>
-                  <strong>{m.concert.title}</strong>
-                  <span>{m.concert.venue}</span>
-                  <span className="price-tag">{m.concert.priceRange}</span>
-                </div>
-              </div>
-            )}
-            {m.opts && (
-              <div className="message-options">
-                {m.opts.map((o, i) => (
-                  <button
-                    key={i}
-                    className="option-btn"
-                    disabled={typing || m.id !== lastId}
-                    onClick={o.action}
-                  >
-                    {o.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
-        {typing && (
-          <div className="typing-indicator">
-            <div className="dot" /><div className="dot" /><div className="dot" />
-          </div>
-        )}
-        <div ref={bottomRef} />
-      </div>
-
-      {/* Input */}
-      <div className="chat-input-area">
-        <form className="input-form" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder={step === 'ENTER_QTY' ? 'Number of tickets (1–10)…' : 'Type a message…'}
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            disabled={typing}
-          />
-          <button type="submit" className="send-btn" disabled={!input.trim() || typing}>
-            <Send size={16} />
-          </button>
-        </form>
-        <p className="powered-by">Powered by Festora · Supabase</p>
-      </div>
     </div>
-  </div>
-);
+  );
 }
 
 async function fetchEvents() {
